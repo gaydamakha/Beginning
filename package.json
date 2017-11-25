@@ -1,5 +1,5 @@
 {
-  "name": "NodeGame1",
+  "name": "NodeGame2",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -7,6 +7,6 @@
     "test"  : "echo \"Error: no test specified\" && exit 1",
     "start" : "node app.js"
       },
-  "author": "Web.Usov",
+  "author": "Web-Usov and Misha",
   "license": "ISC"
 }
