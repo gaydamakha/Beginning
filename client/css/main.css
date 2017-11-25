@@ -1,0 +1,128 @@
+body,html{
+	font-family: 'Exo_2';
+	font-size: 16px;
+  position: relative;
+  overflow:hidden;
+
+}
+hr {
+  height: 0;
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
+  border: 0;
+  border-top: dotted 2px #ddd;  
+  margin: 10px 5px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+input.input{
+ border-radius: 4px;
+ border-color: #ddd;
+ border-style: solid;
+ padding: 2px;
+}
+input.input:active,input.input:focus{
+ border-color: #bbb;
+}
+.container{
+	padding:5px;
+}
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+      touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-image: none;
+  background-color: #eee;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  border-color: #bbb;
+}
+.box{
+/*  height: 100%;
+  padding: 20px;*/
+
+}
+#main_canvas{
+/*   border: solid 1px #000000;
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;*/
+  overflow: hidden;
+  font-size: 30px;
+
+}
+#menu{
+  position: absolute;
+  width: 200px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: block;
+  top: 0;
+  padding: 10px;
+  right: -200px;
+  transition: 1s;
+}
+#menu.active{
+  right: 0;
+}
+#menuBtn{
+  position: absolute;
+  top: 0;
+  height: 30px;
+  width: 30px;
+  background-color: rgba(0, 0, 0, 0.6);
+  right: 100%;
+}
+#menuBtn i{
+  color: #fff;
+  font-size: 22px;
+  padding: 4px;
+  margin-left: 1px;
+
+}
+#menuBtn:hover{  
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+#menu h4{
+  color: #fff;
+  display: block;
+  text-align: center;
+}
+#chatOutput{
+  height: 100px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  border: solid 2px #eaeaea;
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+}
+#chatOutput li{
+  list-style: none;
+  font-size: 14px;
+}
+#menu input, #menu button,#menu #chatOutput{
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+}
