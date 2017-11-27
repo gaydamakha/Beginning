@@ -7,6 +7,12 @@ app.get('/',function(req, res) {
 });
 app.use('/',express.static(__dirname + '/client'));
 
-serv.listen(2001);
+serv.listen(3000);
 
 console.log('Сервер запущен.')
+
+var io = require('socket.io')(serv,{});
+
+io.sockets.on('connection', function(socket){
+	console.log('Пользователь подключился.');
+})
