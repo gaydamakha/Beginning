@@ -1,12 +1,33 @@
 {
-  "name": "NodeGame2",
-  "version": "1.0.0",
-  "description": "",
+  "name": "nodegame2",
+  "version": "0.0.1",
+  "description": "BEST GAAME",
   "main": "app.js",
   "scripts": {
-    "test"  : "echo \"Error: no test specified\" && exit 1",
-    "start" : "node app.js"
-      },
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
   "author": "Web-Usov and Misha",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chobzakodit/Beginning.git"
+  },
+  "keywords": [
+    "node",
+    "game",
+    "web",
+    "game",
+    "web",
+    "app"
+  ],
+  "bugs": {
+    "url": "https://github.com/chobzakodit/Beginning/issues"
+  },
+  "homepage": "https://github.com/chobzakodit/Beginning#readme"
 }
