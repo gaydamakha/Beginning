@@ -1,0 +1,51 @@
+body{
+	font-family: 'Exo_2';
+	font-size: 16px;
+}
+hr {
+  height: 0;
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
+  border: 0;
+  border-top: dotted 2px #ddd;  
+  margin: 10px 5px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+input.input{
+ border-radius: 4px;
+ border-color: #ddd;
+ border-style: solid;
+ padding: 2px;
+}
+input.input:active,input.input:focus{
+ border-color: #bbb;
+}
+.container{
+	padding:5px;
+}
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+      touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-image: none;
+  background-color: #eee;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  border-color: #bbb;
+}
