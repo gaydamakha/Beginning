@@ -25,7 +25,6 @@ $(document).ready(function(){
 
 	socket.on('newPositions',function(data) {
 		areaCtx.clearRect(0,0,area.clientWidth,area.clientHeight);
-//		areaCtx.clearArc(0,0,area.clientWidth,area.clientHeight);
 
 		for(var i = 0 ; i < data.player.length; i++){
 

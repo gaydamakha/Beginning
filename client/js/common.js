@@ -6,8 +6,8 @@ $(document).ready(function(){
 	var box = document.getElementById('box');
 
 	areaSize = function(){
-	    area.width = window.innerWidth-8;
-	    area.height =  window.innerHeight-5;
+	    area.width = $(window).width()-8;
+	    area.height = $(window).height()-5;
 	}
 	areaSize();
 	$(window).resize( areaSize );
