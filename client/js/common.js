@@ -1,6 +1,19 @@
 $(document).ready(function(){
 
+	var area = document.getElementById('canvas');
+	var areaCtx = area.getContext('2d');
 	var socket = io();
+	var box = document.getElementById('box');
+
+	areaSize = function(){
+	    area.width = window.innerWidth-8;
+	    area.height =  window.innerHeight-5;
+	}
+	areaSize();
+	$(window).resize( areaSize );
+
+
+
 
 
 
