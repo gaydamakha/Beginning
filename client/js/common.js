@@ -10,8 +10,13 @@ $(document).ready(function(){
 	    area.height = $(window).height()-5;
 	}
 	areaSize();
+	areaCtx.font='30px Arial';
 	$(window).resize( areaSize );
 
+	socket.on('newPosition',function(data){
+		areaCtx.clearRect(0,0,area.width,area.height);
+		areaCtx.fillText('LEHA',data.x,data.y);
+	});
 
 
 
