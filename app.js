@@ -20,18 +20,24 @@ io.sockets.on('connection', function(socket){
 	socket.x = 0;
 	socket.y = 0;
 	SOCKET_LIST[socket.id] = socket;
-	console.log('Пользователь подключился.');
-})
-
+	console.log('Пользователь ' + socket.id + ' подключился.');
+	socket.on('disconnect',function(){
+		delete SOCKET_LIST[socket.id];
+		console.log('Пользователь ' + socket.id + ' отключился.')
+	});
+});
 
 setInterval(function(){
+	var pack=[];
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-		socket.x++;
-		socket.y++;
-		socket.emit('newPosition',{
-			x:socket.x,
-			y:socket.y
+		pack.push({
+			x:socket.x++,
+			y:socket.y++
 		});
+	}
+	for (var i in SOCKET_LIST){
+		var socket = SOCKET_LIST[i];
+		socket.emit('newPosition',pack);
 	}
 },1000/25);

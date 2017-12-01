@@ -15,12 +15,9 @@ $(document).ready(function(){
 
 	socket.on('newPosition',function(data){
 		areaCtx.clearRect(0,0,area.width,area.height);
-		areaCtx.fillText('LEHA',data.x,data.y);
+		for (var i=0; i<data.length;i++)
+			areaCtx.fillText('LEHA',data[i].x,data[i].y);
 	});
-
-
-
-
 
 });
 
