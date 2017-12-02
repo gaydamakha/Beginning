@@ -39,7 +39,7 @@ var Player = function(id){
 			self.pressingUp    && self.pressingLeft ||
 			self.pressingDown  && self.pressingLeft)
 			a=Math.pow(2,1/2)/2;
-		
+	
 
 		if (self.pressingRight)
 			self.x+=self.maxSpd*a;
