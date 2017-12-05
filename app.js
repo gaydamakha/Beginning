@@ -12,62 +12,79 @@ server.listen(80);
 console.log('Сервер запущен.')
 
 var SOCKET_LIST = {};
-var PLAYER_LIST = {};
 
-
-var Player = function(id){
+var Entity = function() {
 	var self = {
 		x:250,
 		y:250,
-		id:id,
-		number:"" + Math.floor(10 * Math.random()),
-		pressingRight:false,
-		pressingLeft:false,
-		pressingUp:false,
-		pressingDown:false,
-		maxSpd:10,
-	};
+		spdX:0,
+		spdY:0,
+		id:"",
+	}
+	self.update = function(){
+		self.updatePosition();
+	}
 	self.updatePosition = function(){
+		self.x +=self.spdX;
+		self.y +=self.spdY;
+	}
+	return self;
+}
+var Player = function(id){
+	var self = Entity();
+	self.id = id;
+	self.number = "" + Math.floor(10 * Math.random());
+	self.pressingRight = false;
+	self.pressingLeft = false;
+	self.pressingUp = false;
+	self.pressingDown = false;
+	self.maxSpd = 10;
+
+	var super_update = self.update;
+	self.update = function(){
+		self.updateSpd();
+		super_update();
+	}
+
+	self.updateSpd = function() {
 
 		a=1;
-		if (self.pressingRight && self.pressingUp ||
-			self.pressingRight && self.pressingDown ||
-			self.pressingLeft  && self.pressingUp ||
-			self.pressingLeft  && self.pressingDown ||
-			self.pressingUp    && self.pressingRight ||
-			self.pressingDown  && self.pressingRight ||
-			self.pressingUp    && self.pressingLeft ||
-			self.pressingDown  && self.pressingLeft)
+		// if (self.pressingRight && self.pressingUp ||
+		// 	self.pressingRight && self.pressingDown ||
+		// 	self.pressingLeft  && self.pressingUp ||
+		// 	self.pressingLeft  && self.pressingDown)
+		// 	a=Math.pow(2,1/2)/2;
+
+		if (self.pressingRight && self.pressingUp)
+			a=Math.pow(2,1/2)/2;
+		else if (self.pressingRight && self.pressingDown) 
+			a=Math.pow(2,1/2)/2;
+		else if (self.pressingLeft && self.pressingUp)
+			a=Math.pow(2,1/2)/2;
+		else if (self.pressingLeft && self.pressingDown)
 			a=Math.pow(2,1/2)/2;
 
 		if (self.pressingRight)
-			self.x+=self.maxSpd*a;
-		if (self.pressingLeft)
-			self.x-=self.maxSpd*a;
+			self.spdX = self.maxSpd*a;
+		else if (self.pressingLeft)
+			self.spdX = -self.maxSpd*a;
+		else
+			self.spdX = 0;
 		if (self.pressingUp)
-			self.y-=self.maxSpd*a;
-		if (self.pressingDown)
-			self.y+=self.maxSpd*a;
+			self.spdY = -self.maxSpd*a;
+		else if (self.pressingDown)
+			self.spdY = self.maxSpd*a;
+		else
+			self.spdY = 0;
 	};
+	Player.list[id] = self;
 	return self;
 }
+Player.list = {};
 
-var io = require('socket.io')(server,{});
-
-io.sockets.on('connection', function(socket){
-	socket.id = Math.random();
-	SOCKET_LIST[socket.id] = socket;
-
-	var player = Player(socket.id);
-	PLAYER_LIST[socket.id] = player;
-
+Player.onConnect = function(socket){
 	console.log('Пользователь ' + socket.id + ' подключился.');
-
-	socket.on('disconnect',function(){
-		delete SOCKET_LIST[socket.id];
-		delete PLAYER_LIST[socket.id];
-		console.log('Пользователь ' + socket.id + ' отключился.');
-	});
+	var player = Player(socket.id);
 
 	socket.on('keyPress',function(data){
 		if (data.inputId === 'left')
@@ -79,19 +96,45 @@ io.sockets.on('connection', function(socket){
 		else if(data.inputId === 'down')
 			player.pressingDown = data.state;
 	});
-});
+}
 
-setInterval(function(){
+Player.onDisconnect = function(socket){
+	delete Player.list[socket.id];
+}
+
+Player.update = function(){
 	var pack=[];
-	for(var i in PLAYER_LIST){
-		var player = PLAYER_LIST[i];
-		player.updatePosition();
+	for(var i in Player.list){
+		var player = Player.list[i];
+		player.update();
 		pack.push({
 			x:player.x,
 			y:player.y,
 			number:player.number
 		});
 	}
+	return pack;
+}
+
+var io = require('socket.io')(server,{});
+
+
+io.sockets.on('connection', function(socket){
+	socket.id = Math.random();
+	SOCKET_LIST[socket.id] = socket;
+
+		Player.onConnect(socket);
+	socket.on('disconnect',function(){
+		delete SOCKET_LIST[socket.id];
+		Player.onDisconnect(socket);
+		console.log('Пользователь ' + socket.id + ' отключился.');
+	});
+	
+});
+
+setInterval(function(){
+	var pack = Player.update();
+
 	for (var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
 		socket.emit('newPosition',pack);
