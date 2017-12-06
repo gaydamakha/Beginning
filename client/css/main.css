@@ -26,6 +26,7 @@ input.input{
  border-color: #ddd;
  border-style: solid;
  padding: 2px;
+ box-sizing: border-box;
 }
 input.input:active,input.input:focus{
  border-color: #bbb;

@@ -34,6 +34,7 @@ var Player = function(id){
 	var self = Entity();
 	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
+	self.create = false;
 	self.pressingRight = false;
 	self.pressingLeft = false;
 	self.pressingUp = false;
@@ -49,11 +50,6 @@ var Player = function(id){
 	self.updateSpd = function() {
 
 		a=1;
-		// if (self.pressingRight && self.pressingUp ||
-		// 	self.pressingRight && self.pressingDown ||
-		// 	self.pressingLeft  && self.pressingUp ||
-		// 	self.pressingLeft  && self.pressingDown)
-		// 	a=Math.pow(2,1/2)/2;
 
 		if (self.pressingRight && self.pressingUp)
 			a=Math.pow(2,1/2)/2;
@@ -86,6 +82,10 @@ Player.onConnect = function(socket){
 	console.log('Пользователь ' + socket.id + ' подключился.');
 	var player = Player(socket.id);
 
+	socket.on('createPlayer',function(data){
+		player.create = data.flag;
+	});
+
 	socket.on('keyPress',function(data){
 		if (data.inputId === 'left')
 			player.pressingLeft = data.state;
@@ -110,7 +110,8 @@ Player.update = function(){
 		pack.push({
 			x:player.x,
 			y:player.y,
-			number:player.number
+			number:player.number,
+			create:player.create
 		});
 	}
 	return pack;
