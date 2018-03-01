@@ -9,6 +9,9 @@ body,html{
   height: 100%;
   display: block;
 }
+.container-fluid .row,.container .row{
+  width: 100%;
+}
 hr {
   height: 0;
   -webkit-box-sizing: content-box;
@@ -63,28 +66,38 @@ input.input:active,input.input:focus{
   border-radius: 4px;
   border-color: #bbb;
 }
-.box{
+.box-login,.box-restart{
   display: block;
   height: 100%;
-  background-color: rgba(230, 233, 232, 0.3);
+  background-color: rgba(0, 0, 0, 0.5);
   position: relative;
-
+  position: absolute;
+  width: 100%;
+}
+.box-restart{
+  display: none;
 }
 #canvas{
-  display: none;
+  display: block;
   margin-left: 2px;
   font-size: 20px;
   overflow: hidden;
+  border:solid 2px #1DE;
 }
 #inputName{
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
+  border-color: #11B6EE;
 
 }
 #btnStart{
   width: 100%;
+  background-color: #1DE;
+  border-color: #1BE;
+  border-width: 2px;
 }
-.title-player-name{
+.box-restart h3,.box-login h3{
   display: block;
   text-align: center;
+  margin: 30px 0;
 }

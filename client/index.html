@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 	<meta charset="UTF-8"> <!-- Кодировка -->
 	<title>Node game</title> <!-- Заголовок -->
@@ -24,20 +24,35 @@
 	<link rel="stylesheet" href="css/media.css"> 
 </head>
 <body>
-<!-- Рабочая зона -->
-<div class="container-fluid box">
+<!-- Login block -->
+<div class="container-fluid box-login">
 	<div class="row">
-		<div class="col-md-offset-4 col-md-4">
-			<h3 class="title-player-name">Input palyer's name:</h3>
-			<input type="text" class="input" id="inputName" placeholder="Name...">
-			<button id="btnStart" class="btn" id="btnStart">Start</button>
+		<div class="col-sm-offset-4 col-sm-4 col-lg-2 col-lg-offset-5">
+			<h3 class="">Input player's name:</h3>
+			<form action="" id="login">				
+				<input type="text" class="input" id="inputName" placeholder="Name...">
+				<button id="btnStart" class="btn" type="submit">Start</button>
+			</form>
 		</div>
 	</div>
-</div>	 
+</div>
 
-<canvas id="canvas" height="" width=""></canvas>
+<!-- Restart block -->
+<div class="container-fluid box-restart">
+	<div class="row">
+		<div class="col-md-offset-4 col-md-4">
+			<h3 class="">You're killed :с</h3>
+			<form action="" id="restart">				
+				<button id="btnStart" class="btn" type="submit">Restart</button>
+			</form>
+		</div>
+	</div>
+</div>
 
-<!-- Конец рабочей зоны -->
+
+<!-- Canvans, Captain obvious -->
+<canvas id="canvas" height="" width="">Upgrade your browser</canvas>
+
 
 <!-- Подключённые библиотеки -->
 <script src="js/jquery/jquery-1.11.2.min.js"></script> <!-- Библиотека Jquery -->
