@@ -11,9 +11,33 @@ server.listen(80);
 
 var io = require('socket.io')(server,{});
 
-console.log('Сервер запущен :)')
+var TIME = function() {
+	var date = new Date();
+	date.setHours(date.getUTCHours()+4);
+	return date.getHours() + ':' + date.getMinutes() + ':' + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+} 
+
+console.log(TIME()+' : Сервер запущен.')
 
 var SOCKET_LIST = {};
+
+
+var Map = function() {
+	var self = {
+		width: 500,
+		height:500,
+		border:1,
+
+	}
+	self.minX = self.border;
+	self.minY = self.border;
+	self.maxX = self.width - self.border;
+	self.maxY = self.height - self.border;
+	return self;
+}
+var Map = Map();
+
+
 
 var Entity = function() {
 	var self = {
@@ -31,31 +55,47 @@ var Entity = function() {
 		self.x +=self.spdX;
 		self.y +=self.spdY;
 	}
+	self.getDistance = function(object){
+		return Math.sqrt(Math.pow(object.x-self.x,2)+Math.pow(object.y-self.y,2));
+	}
 	return self;
 }
 
 
 
-var Player = function(id,name){
+var Player = function(socket){
 	var self = Entity();
-	self.x = 0;
-	self.y = 0;
-	self.id = id;
-	self.name = name;
-	self.health = 100;
-	self.size = 50;
-	self.startSize = self.size;
+	self.size = {
+		d:50,
+		value:50,
+		min:5
+	}
+	self.x = Tools.getRandomInt(Map.minX+self.size.d,Map.maxX-self.size.d);
+	self.y = Tools.getRandomInt(Map.minY+self.size.d,Map.maxY-self.size.d);
+	self.id = socket.id;
+	self.name = socket.name;
+	self.health = {
+		d:100,
+		value:100
+	};
+
+	self.score = 0;
+
 	self.pressingRight = false;
 	self.pressingLeft = false;
 	self.pressingUp = false;
 	self.pressingDown = false;
 	self.pressingAttack=false;
 	self.mouseAngle=0;
-	self.maxSpd = 10;
+
+	self.maxSpd = 13;
+	self.boost = 0.5;
+
+
+
 	self.color = Tools.generateColor();
 	self.bulletColor = Tools.generateColor();
-
-
+	
 	var super_update = self.update;
 	self.update = function(){
 		self.updateSpd();
@@ -67,19 +107,27 @@ var Player = function(id,name){
 			b.y=self.y;
 			self.pressingAttack = false;
 		}
-		if (self.health <= 0) {
+		//console.log(self.x+':'+self.y);
+	}
+
+	self.hit = function(parentId,damage){
+		self.health.value-=damage;
+		self.size.value=self.size.min+(self.health.value/100)*(self.size.d-self.size.min);
+		if (self.health.value <= 0) {
+
+			Player.list[parentId].score++;
+
 			Player.onDisconnect(self.id);
 			var socket = SOCKET_LIST[self.id];
 			socket.emit('restart');
+
+			var msg = self.name + ' убит.';
+			log(msg);
 		}
 	}
 
-	self.hit = function(){
-		self.health-=10;
-		self.size=5+(self.health/100)*(self.startSize-5)
-	}
-
 	self.updateSpd = function() {
+		self.maxSpd = (10+(3*((self.health.d-self.health.value)/100)));
 
 		a=1;
 
@@ -92,32 +140,96 @@ var Player = function(id,name){
 		else if (self.pressingLeft && self.pressingDown)
 			a=Math.pow(2,1/2)/2;
 
-		if (self.pressingRight)
-			self.spdX = self.maxSpd*a;
-		else if (self.pressingLeft)
-			self.spdX = -self.maxSpd*a;
-		else
-			self.spdX = 0;
-		if (self.pressingUp)
-			self.spdY = -self.maxSpd*a;
-		else if (self.pressingDown)
-			self.spdY = self.maxSpd*a;
-		else
-			self.spdY = 0;
+
+		if (self.pressingRight){
+			if (self.spdX < self.maxSpd*a) {
+				self.spdX += self.boost;
+			}else self.spdX	= self.maxSpd*a;		
+		}			
+		else if (self.pressingLeft){
+			if (self.spdX > -self.maxSpd*a) {
+				self.spdX -= self.boost;
+			}else self.spdX	= -self.maxSpd*a;			
+		}
+		else{
+			if (self.spdX>0) {
+				self.spdX -= self.boost;
+			}else if(self.spdX<0){
+				self.spdX += self.boost;
+			}
+			if (Math.abs(self.spdX) <= (self.boost / 2)) {
+				self.spdX = 0;
+			}
+		}
+
+		if (self.pressingUp){
+			if (self.spdY > -self.maxSpd*a) {
+				self.spdY -= self.boost;
+			}else self.spdY	= -self.maxSpd*a;				
+		}
+		else if (self.pressingDown){		
+			if (self.spdY < self.maxSpd*a) {
+				self.spdY += self.boost;
+			}else self.spdY	= self.maxSpd*a;	
+		}
+		else{
+			if (self.spdY>0) {
+				self.spdY -= self.boost;
+			}else if(self.spdY<0){
+				self.spdY += self.boost;
+			}
+			if (Math.abs(self.spdY) <= (self.boost / 2)) {
+				self.spdY = 0;
+			}
+		}
+
+		if (self.x + self.size.value >= Map.maxX) {
+			self.spdX = -1;
+		}else if (self.x - self.size.value <= Map.minX) {
+			self.spdX = +1;
+		}
+
+		if (self.y + self.size.value >= Map.maxY) {
+			self.spdY = -1;
+		}else if (self.y - self.size.value <= Map.minY) {
+			self.spdY = +1;
+		}
+		//console.log(self.spdX+' : '+self.spdY);
+
 	};
-	Player.list[id] = self;
+
+	self.getInitPack = function(){
+		return {
+			id:self.id,
+			x:self.x,
+			y:self.y,	
+			size:self.size.value,	
+			name:self.name,
+			color:self.color,
+			score:self.score,
+		};		
+	}
+	self.getUpdatePack = function(){
+		return {
+			id:self.id,
+			x:self.x,
+			y:self.y,
+			size:self.size.value,
+			score:self.score,
+		}	
+	}
+
+	Player.list[socket.id] = self;
+	initPack.player.push(self.getInitPack());
 	return self;
 }
 Player.list = {};
 
-Player.onConnect = function(socket,name){
-	console.log('Пользователь ' + socket.id + ' подключился.');
-	var player = Player(socket.id,name);
+Player.onConnect = function(socket){
+	var player = Player(socket);
 	socket.on('mousePosition',function(data){
 		var x = data.x;
 		var y = data.y; 
-		// var x = data.x - player.x;
-		// var y = data.y - player.y; 
 		player.mouseAngle = Math.atan2(y,x)/Math.PI * 180;
 	})
 	socket.on('keyPress',function(data){
@@ -132,10 +244,21 @@ Player.onConnect = function(socket,name){
 		else if(data.inputId === 'attack')
 			player.pressingAttack=data.state;
 	});
+	socket.emit('init',{
+		selfId:socket.id,
+		player:Player.getAllInitPack(),
+		bullet:Bullet.getAllInitPack(),
+	})
 }
-
+Player.getAllInitPack = function(){
+	var players = [];
+	for(var i in Player.list)
+		players.push(Player.list[i].getInitPack());
+	return players;
+}
 Player.onDisconnect = function(id){
 	delete Player.list[id];
+	removePack.player.push(id);
 }
 
 Player.update = function(){
@@ -143,28 +266,22 @@ Player.update = function(){
 	for(var i in Player.list){
 		var player = Player.list[i];
 		player.update();
-		pack.push({
-			id:player.id,
-			x:player.x,
-			y:player.y,
-			name:player.name,
-			health:player.health,
-			size:player.size,
-			color:player.color
-		});
+		pack.push(player.getUpdatePack());
 	}
 	return pack;
 }
 
 var Bullet = function(parentId){
 	var self = Entity();
-	self.id=Math.random();
+	self.id = Math.random();
+	self.parentId = parentId;
 	self.size = 8;
 	self.maxSpd = 20;
-	self.angle = Player.list[parentId].mouseAngle;
-	self.spdX=Math.cos(self.angle/180*Math.PI) * self.maxSpd;
-	self.spdY=Math.sin(self.angle/180*Math.PI) * self.maxSpd;
-	self.color = Player.list[parentId].bulletColor;
+	self.damage = 10;
+	self.angle = Player.list[self.parentId].mouseAngle;
+	self.spdX = Math.cos(self.angle/180*Math.PI) * self.maxSpd;
+	self.spdY = Math.sin(self.angle/180*Math.PI) * self.maxSpd;
+	self.color = Player.list[self.parentId].bulletColor;
 
 	self.timer = 0;
 	self.toRemove = false;
@@ -172,29 +289,40 @@ var Bullet = function(parentId){
 	var super_update=self.update;
 	self.update=function(){
 
-		if (self.timer++ > 50)	{
+		if (self.timer++ > 100)	{
 			self.toRemove = true;
-		}
-
-		if (self.toRemove){
-			self.delete();
 		}
 
 		super_update();
 
 		for(var i in Player.list){
 			var player = Player.list[i];
-			var distance = Math.sqrt(Math.pow(player.x-self.x,2)+Math.pow(player.y-self.y,2))<player.size+self.size;
-			if (parentId !== player.id && distance) {
-				self.delete();
-				player.hit();
+			var distance = self.getDistance(player);
+			if (self.parentId !== player.id && distance<player.size.value+self.size) {
+				player.hit(self.parentId,self.damage);
+				self.toRemove=true;
 			}
 		}
 	}
-	self.delete = function(){
-		delete Bullet.list[self.id];
+	self.getInitPack = function(){
+		return {
+			id:self.id,
+			x:self.x,
+			y:self.y,
+			color:self.color,
+			size:self.size		
+		};
 	}
-	Bullet.list[self.id]=self;
+	self.getUpdatePack = function(){
+		return {
+			id:self.id,
+			x:self.x,
+			y:self.y,		
+		};
+	}
+	
+	Bullet.list[self.id] = self;
+	initPack.bullet.push(self.getInitPack());
 	return self;
 }
 
@@ -205,45 +333,97 @@ Bullet.update = function(){
 	for(var i in Bullet.list){
 		var bullet = Bullet.list[i];
 		bullet.update();
-		pack.push({
-			x:bullet.x,
-			y:bullet.y,
-			color:bullet.color,
-			size:bullet.size
-		});
+		if(bullet.toRemove){
+			delete Bullet.list[i];
+			removePack.bullet.push(bullet.id);
+		}
+		else
+			pack.push(bullet.getUpdatePack());
 	}
 	return pack;
 }
+Bullet.getAllInitPack = function(){
+	var bullets = [];
+	for(var i in Bullet.list)
+		bullets.push(Bullet.list[i].getInitPack());
+	return bullets;
+}
 
+var DEBUG = false;
 
 io.sockets.on('connection', function(socket){
+
 	socket.id = Math.random();
+	socket.flag = true;
 	SOCKET_LIST[socket.id] = socket;
 
+	socket.emit('drawMap',{map:Map});
 	socket.on('createPlayer',function(data){
-		Player.onConnect(socket,data.name);
-		socket.emit('getId',{selfId:socket.id});
+		socket.name = data.name;
+		Player.onConnect(socket);
+		if (socket.flag) {			
+			var msg = socket.name + ' подключился.';
+			log(msg);
+			socket.flag = false;
+		}
 	});
+
+
 	socket.on('disconnect',function(){
 		delete SOCKET_LIST[socket.id];
 		Player.onDisconnect(socket.id);
-		console.log('Пользователь ' + socket.id + ' отключился.');
+		var msg = socket.name + ' отключился.';
+		log(msg);
+
+	});
+
+
+
+	socket.on('sendMsgToServer',function(data){
+		for(var i in SOCKET_LIST){
+			SOCKET_LIST[i].emit('addToChat',{id:data.id,msg:data.msg});
+		}
+	});
+	
+	socket.on('evalServer',function(data){
+		if(!DEBUG)
+			return;
+		var res = eval(data);
+		socket.emit('evalAnswer',res);		
 	});
 	
 });
+
+var initPack = {player:[],bullet:[]};
+var removePack = {player:[],bullet:[]};
+
 
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
 	}
-
-	for (var i in SOCKET_LIST){
+	
+	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-		socket.emit('newPosition',pack);
+		socket.emit('init',initPack);
+		socket.emit('update',pack);
+		socket.emit('remove',removePack);
 	}
+	initPack.player = [];
+	initPack.bullet = [];
+	removePack.player = [];
+	removePack.bullet = [];
+	
 },30);
 
+
+var log = function(data){
+	console.log(TIME()+' : '+data);
+	for(var i in SOCKET_LIST){
+		SOCKET_LIST[i].emit('addToLog',{date:TIME(),log:data});
+	}
+}
 
 var Tools = {
 	generateColor: function(){
@@ -251,5 +431,7 @@ var Tools = {
 	},
 	getRandomInt: function(min,max){
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
+	}	
 };
+
+

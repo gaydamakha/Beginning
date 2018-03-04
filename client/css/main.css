@@ -34,13 +34,13 @@ input.input{
 input.input:active,input.input:focus{
  border-color: #bbb;
 }
-.disabled{
-  display: none;
-}
 .active{
   display: block;
 }
-.container{
+div.disabled{
+  display: none;
+}
+div.container{
 	padding:5px;
 }
 .btn {
@@ -49,7 +49,6 @@ input.input:active,input.input:focus{
   margin-bottom: 0;
   font-size: 14px;
   font-weight: normal;
-  line-height: 1.1;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
@@ -62,9 +61,16 @@ input.input:active,input.input:focus{
           user-select: none;
   background-image: none;
   background-color: #eee;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   border-radius: 4px;
   border-color: #bbb;
+}
+.btn-primary{
+  background-color: #1DE;
+  border-color: #1BE;
+}
+.box-game{
+
 }
 .box-login,.box-restart{
   display: block;
@@ -75,7 +81,7 @@ input.input:active,input.input:focus{
   width: 100%;
 }
 .box-restart{
-  display: none;
+
 }
 #canvas{
   display: block;
@@ -83,6 +89,7 @@ input.input:active,input.input:focus{
   font-size: 20px;
   overflow: hidden;
   border:solid 2px #1DE;
+  z-index: -100;
 }
 #inputName{
   width: 100%;
@@ -92,12 +99,79 @@ input.input:active,input.input:focus{
 }
 #btnStart{
   width: 100%;
-  background-color: #1DE;
-  border-color: #1BE;
-  border-width: 2px;
 }
-.box-restart h3,.box-login h3{
+.box-restart .title-restart,.box-login .title-input{
   display: block;
   text-align: center;
   margin: 30px 0;
+}
+.title-login{
+  text-align: center;
+}
+#miniMap{
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  border: solid 2px #3ae;
+  display: block;
+  box-sizing: border-box;
+  background-color: #555;
+}
+#box-chat{
+  position: absolute;
+  left: 20px;
+  bottom: 20px;  width: 400px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: solid 4px #1BE;
+  border-radius: 8px;
+  padding: 5px;
+  opacity: 0.3;
+}
+#box-chat:hover,#box-chat:active,#box-chat:focus{
+  opacity: 1;
+}
+.chat-title{
+  display: block;
+  background-color: #ddd;
+  padding: 5px;
+  text-align: center; 
+  margin: -5px -5px 0 -5px;
+
+}
+#chat-output{
+  height: 170px;
+  font-size: 14px;
+  overflow: hidden;
+  padding:  5px 0;
+  box-sizing: border-box;
+}
+#chat-output > ul{
+  padding: 0;
+  margin: 0;
+  overflow-y: scroll;
+
+  overflow-x: hidden;
+  height: 160px;
+
+}
+#chat-output > ul > li > span{
+  font-weight: bold ;
+  min-width: 50px;
+  display: inline-block;
+}
+
+#chat-input,#chat-btn{
+  display: inline-block;
+  height: 30px;
+  box-sizing: border-box;
+}
+#chat-input{
+  width: 310px;
+  background-color: #ddd;
+
+}
+#chat-btn{
+  width: 80px;
+  float: right;
+  vertical-align:inherit;
 }
