@@ -120,7 +120,7 @@ div.container{
 #box-chat{
   position: absolute;
   left: 20px;
-  bottom: 20px;  width: 400px;
+  bottom: 20px;
   background-color: rgba(0, 0, 0, 0.5);
   border: solid 4px #1BE;
   border-radius: 8px;
@@ -139,7 +139,6 @@ div.container{
 
 }
 #chat-output{
-  height: 170px;
   font-size: 14px;
   overflow: hidden;
   padding:  5px 0;
@@ -151,7 +150,6 @@ div.container{
   overflow-y: scroll;
 
   overflow-x: hidden;
-  height: 160px;
 
 }
 #chat-output > ul > li > span{
@@ -162,16 +160,12 @@ div.container{
 
 #chat-input,#chat-btn{
   display: inline-block;
-  height: 30px;
   box-sizing: border-box;
 }
 #chat-input{
-  width: 310px;
   background-color: #ddd;
-
 }
 #chat-btn{
-  width: 80px;
   float: right;
   vertical-align:inherit;
 }

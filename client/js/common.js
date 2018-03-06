@@ -12,13 +12,23 @@ $(document).ready(function(){
 	miniMap.width = 150;
 	miniMap.height = 150;
 	
+	//media
 
+	var mediaUp =function(){
+	    if (area.width<768) {
+			$("#box-chat").css("display","none");			
+	    }
+	}
+	
 	areaSize = function(){
 	    area.width = $(window).width()-8;
 	    area.height = $(window).height()-5;
+	    mediaUp();
 	}
 	areaSize();
 	$(window).resize(areaSize);
+
+
 
 	//images
 
@@ -46,20 +56,25 @@ $(document).ready(function(){
 				socket.emit('createPlayer',{name:inputName.value})	
 				login.parentNode.removeChild(login);
 				$(".box-login, .box-game, #box-chat").toggle();
+				mediaUp();
 			}
 		}
     }
     //restart
-    restart.onsubmit = function(e) {
-		e.preventDefault();
 
-		socket.emit('createPlayer',{name:inputName.value})	
-
-		$(".box-restart, .box-game").toggle();
-    }
     socket.on('restart',function(){    	
 		$(".box-restart, .box-game").toggle();
     });
+
+    restart.onsubmit = function(e) {
+		e.preventDefault();
+
+		//socket.emit('createPlayer',{name:inputName.value})	
+
+		socket.emit('reCreate')
+
+		$(".box-restart, .box-game").toggle();
+    }
 
 
     // Outpu chat and info
@@ -106,6 +121,8 @@ $(document).ready(function(){
 		self.size = initPack.size;
 		self.name = initPack.name;
 		self.color = initPack.color;
+		self.score = initPack.score;
+
 		self.msgTimmer = {
 			d:500,
 			value:500,
@@ -218,6 +235,8 @@ $(document).ready(function(){
 					p.size = pack.size;
 				if(pack.score !== undefined)
 					p.score = pack.score;
+				if(pack.live !== undefined)
+					p.live = pack.live;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -247,8 +266,11 @@ $(document).ready(function(){
 		}
 		drawMap();
 		printScore();
-		for(var i in Player.list)
-			Player.list[i].draw();
+		for(var i in Player.list){
+			if (Player.list[i].live) {
+				Player.list[i].draw();
+			}
+		}
 		for(var i in Bullet.list)
 			Bullet.list[i].draw();
 	},10);

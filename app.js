@@ -5,17 +5,24 @@ var server = require('http').Server(app);
 app.get('/',function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
 });
+app.get('/about',function(req, res) {
+	res.sendFile(__dirname + '/client/about.html');
+});
 app.use('/',express.static(__dirname + '/client'));
 
 server.listen(80);
 
 var io = require('socket.io')(server,{});
 
+require('./site');
+
 var TIME = function() {
 	var date = new Date();
 	date.setHours(date.getUTCHours()+4);
 	return date.getHours() + ':' + date.getMinutes() + ':' + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
 } 
+
+
 
 console.log(TIME()+' : Сервер запущен.')
 
@@ -24,9 +31,9 @@ var SOCKET_LIST = {};
 
 var Map = function() {
 	var self = {
-		width: 500,
-		height:500,
-		border:1,
+		width: 4000,
+		height:4000,
+		border:1000,
 
 	}
 	self.minX = self.border;
@@ -36,7 +43,6 @@ var Map = function() {
 	return self;
 }
 var Map = Map();
-
 
 
 var Entity = function() {
@@ -78,6 +84,7 @@ var Player = function(socket){
 		d:100,
 		value:100
 	};
+	self.live = true;
 
 	self.score = 0;
 
@@ -98,36 +105,54 @@ var Player = function(socket){
 	
 	var super_update = self.update;
 	self.update = function(){
-		self.updateSpd();
-		super_update();
+		if (self.live) {		
+			self.updateSpd();
+			super_update();
 
-		if(self.pressingAttack){
-			var b=Bullet(self.id);
-			b.x=self.x;
-			b.y=self.y;
-			self.pressingAttack = false;
+			if(self.pressingAttack){
+				var b=Bullet(self.id);
+				b.x=self.x;
+				b.y=self.y;
+				self.pressingAttack = false;
+			}
+
 		}
+
 		//console.log(self.x+':'+self.y);
 	}
 
 	self.hit = function(parentId,damage){
 		self.health.value-=damage;
 		self.size.value=self.size.min+(self.health.value/100)*(self.size.d-self.size.min);
-		if (self.health.value <= 0) {
+		if (self.health.value === 0) {
+
+			self.live = false;
 
 			Player.list[parentId].score++;
 
-			Player.onDisconnect(self.id);
+			//Player.onDisconnect(self.id);
 			var socket = SOCKET_LIST[self.id];
 			socket.emit('restart');
 
-			var msg = self.name + ' убит.';
+			var msg = Player.list[parentId].name + ' убил ' + self.name ;
 			log(msg);
 		}
 	}
 
+	self.reCreate = function(){
+
+		self.live = true;
+		self.size.value = self.size.d;
+		self.score = 0;
+		self.health.value = self.health.d;
+		self.x = Tools.getRandomInt(Map.minX+self.size.d,Map.maxX-self.size.d);
+		self.y = Tools.getRandomInt(Map.minY+self.size.d,Map.maxY-self.size.d);
+
+	}
+
+
 	self.updateSpd = function() {
-		self.maxSpd = (10+(3*((self.health.d-self.health.value)/100)));
+		self.maxSpd = (10+(3*((self.health.d-self.health.value)/self.health.d)));
 
 		a=1;
 
@@ -207,6 +232,7 @@ var Player = function(socket){
 			name:self.name,
 			color:self.color,
 			score:self.score,
+			live:self.live,
 		};		
 	}
 	self.getUpdatePack = function(){
@@ -216,6 +242,7 @@ var Player = function(socket){
 			y:self.y,
 			size:self.size.value,
 			score:self.score,
+			live:self.live,
 		}	
 	}
 
@@ -243,11 +270,14 @@ Player.onConnect = function(socket){
 			player.pressingDown = data.state;
 		else if(data.inputId === 'attack')
 			player.pressingAttack=data.state;
-	});
+	})
 	socket.emit('init',{
 		selfId:socket.id,
 		player:Player.getAllInitPack(),
 		bullet:Bullet.getAllInitPack(),
+	})
+	socket.on('reCreate',function(){
+		player.reCreate();
 	})
 }
 Player.getAllInitPack = function(){
@@ -310,7 +340,7 @@ var Bullet = function(parentId){
 			x:self.x,
 			y:self.y,
 			color:self.color,
-			size:self.size		
+			size:self.size,		
 		};
 	}
 	self.getUpdatePack = function(){
@@ -360,12 +390,9 @@ io.sockets.on('connection', function(socket){
 	socket.emit('drawMap',{map:Map});
 	socket.on('createPlayer',function(data){
 		socket.name = data.name;
-		Player.onConnect(socket);
-		if (socket.flag) {			
-			var msg = socket.name + ' подключился.';
-			log(msg);
-			socket.flag = false;
-		}
+		Player.onConnect(socket);			
+		var msg = socket.name + ' подключился.';
+		log(msg);
 	});
 
 
