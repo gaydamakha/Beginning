@@ -49,6 +49,7 @@
   display: block;
   z-index: 999;
   position: absolute;
+  box-sizing: content-box;
 }
 
 .pace .pace-activity {
@@ -76,6 +77,7 @@
   left: 0;
   height: 60px;
   width: 100px;
+  box-sizing: content-box;
 }
 
 .pace .pace-activity:after {
@@ -93,6 +95,7 @@
   -moz-transform: rotate(60deg);
   -o-transform: rotate(60deg);
   transform: rotate(60deg);
+  box-sizing: content-box;
 }
 
 .pace .pace-activity:before {
@@ -109,7 +112,8 @@
   -webkit-transform: rotate(120deg);
   -moz-transform: rotate(120deg);
   -o-transform: rotate(120deg);
-  transform: rotate(120deg);
+  transform: rotate(120deg);  
+  box-sizing: content-box;
 }
 
 
@@ -118,11 +122,12 @@ body.pace-running::after {
     display: block;
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     background-color: #1DE;
     transition: all 0.1s;
+    z-index: 1500;
 }
 
 @-webkit-keyframes pace-theme-center-atom-spin {

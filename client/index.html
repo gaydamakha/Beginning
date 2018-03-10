@@ -20,22 +20,32 @@
 	<link rel="stylesheet" href="fonts/fonts.css">
 	<!-- Подключённые стили -->
 	<link rel="stylesheet" href="css/noramlize.min.css">
-	<link rel="stylesheet" href="css/main.css"> 
+	<link rel="stylesheet" href="css/main-game.css"> 
 	<link rel="stylesheet" href="css/media.css"> 
 </head>
 <body>
 <!-- Login block -->
 <div class="container-fluid box-login">
 	<div class="row">
-		<div class="col-sm-offset-4 col-sm-4 col-lg-4 col-lg-offset-4">
+		<div class="visible-md visible-lg col-md-4 col-md-offset-4">
 			<h2 class="title-login">Node.js Game</h2>
 			<p>Hello my dear friend! You are on the site where we develop a browser game from the IO game series. This project has no specific goals and objectives. We learn, and you test our work :)</p>
 			<p>Authors: <a href="https://vk.com/alexeenka">Usov Alex</a> and <a href="https://vk.com/bambaleilobambaleya">Mikhail Gaydamakha</a></p>
-			<h4 class="title-input">Input player's name:</h3>
+			<h3 class="title-input">Input player's name:</h3>
 			<form action="" id="login">				
 				<input type="text" class="input" id="inputName" placeholder="Name...">
 				<button id="btnStart" class="btn btn-primary">Start</button>
 			</form>
+			<div class="about">
+				<h3>Information about the development of this game</h3>
+				<a href="/about" class="btn btn-primary">About</a>				
+			</div>
+		</div>
+		<div class="visible-xs visible-sm col-sm-offset-2 col-sm-8">			
+			<div class="about">
+				<h3>Most likely, you came to this site from mobile device. At the moment the game does not support management from mobile devices. We recommend you to visit the site with the information about this game.</h3>
+				<a href="/about" class="btn btn-primary">About</a>				
+			</div>
 		</div>
 	</div>
 </div>
@@ -48,6 +58,10 @@
 			<form action="" id="restart">				
 				<button id="btnStart" class="btn btn-primary" type="submit">Restart</button>
 			</form>
+			<div class="about">
+				<h3>Information about the development of this game</h3>
+				<a href="/about" class="btn btn-primary">About</a>				
+			</div>
 		</div>
 	</div>
 </div>
@@ -57,6 +71,13 @@
 	<canvas id="canvas" height="" width="">Update your browser</canvas>
 	<!-- Mini Map -->
 	<canvas id="miniMap" height="" width="">Update your browser</canvas>	
+	<div class="row">
+		<div class="about visible-md visible-lg col-md-4 col-md-offset-4">
+			<h5>Information about the development of this game</h5>
+			<a href="/about" class="btn btn-primary" target="_blank">About</a>				
+		</div>
+		
+	</div>
 </div>
 <!-- box-output-info -->
 <div class="box-chat disabled" id="box-chat">

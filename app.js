@@ -14,7 +14,6 @@ server.listen(80);
 
 var io = require('socket.io')(server,{});
 
-require('./site');
 
 var TIME = function() {
 	var date = new Date();
@@ -379,12 +378,12 @@ Bullet.getAllInitPack = function(){
 	return bullets;
 }
 
-var DEBUG = false;
+var DEBUG = true;
 
 io.sockets.on('connection', function(socket){
 
 	socket.id = Math.random();
-	socket.flag = true;
+
 	SOCKET_LIST[socket.id] = socket;
 
 	socket.emit('drawMap',{map:Map});
@@ -415,8 +414,13 @@ io.sockets.on('connection', function(socket){
 	socket.on('evalServer',function(data){
 		if(!DEBUG)
 			return;
-		var res = eval(data);
-		socket.emit('evalAnswer',res);		
+		if (data === 'restart') {
+			process.exit(5);
+		}else{
+
+			var res = eval(data);
+			socket.emit('evalAnswer',res);	
+		}	
 	});
 	
 });
@@ -461,4 +465,8 @@ var Tools = {
 	}	
 };
 
-
+module.exports = {
+	io:io,
+	time:TIME(),
+	SOCKET_LIST:SOCKET_LIST,
+}

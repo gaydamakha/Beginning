@@ -330,11 +330,23 @@ $(document).ready(function(){
 	var control = true;
 	area.onclick  = function(){	
 		control = true;
+		$('.box-chat').css({'opacity':'0.3'});
 	}
 
-	info.onclick = function(){
+	chatInput.onclick = function() {	
 		control = false;
+
+	}
+	info.onclick = function(){
+		$('.box-chat').css({'opacity':'1'});
 	}	
+
+	// $('.box-chat').hover(function() {
+	// 	$('.box-chat').css({'opacity':'1'})
+	// });
+	// $('#canvas').hover(function() {
+	// 	$('.box-chat').css({'opacity':'0.3'})
+	// });
 
 	document.onkeydown = function(event){
 		if (control) {
@@ -346,6 +358,11 @@ $(document).ready(function(){
 				socket.emit('keyPress',{inputId:'left',state:true});
 			else if (event.keyCode === 87)
 				socket.emit('keyPress',{inputId:'up',state:true});			
+		}else{
+			socket.emit('keyPress',{inputId:'right',state:false});
+			socket.emit('keyPress',{inputId:'down',state:false});
+			socket.emit('keyPress',{inputId:'left',state:false});
+			socket.emit('keyPress',{inputId:'up',state:false});			
 		}
 	}
 	document.onkeyup = function(event){

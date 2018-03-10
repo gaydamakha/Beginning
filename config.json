@@ -1,0 +1,6 @@
+{
+    "port": "80",
+    "secure": true,
+    "secure_key" : "/etc/ssl/ssl_sertificate1.key",
+    "secure_cert" : "/etc/ssl/ssl_sertificate1.crt"
+}
