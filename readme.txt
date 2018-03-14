@@ -10,3 +10,8 @@ sudo systemctl stop nodeapp # остановить сервис
 sudo systemctl restart nodeapp # перезагрузка
 systemctl status nodeapp # посмотреть статус
 journalctl -u nodeapp.service # глянуть логи
+
+
+
+
+sudo nano /etc/ssl/ssl_sertificate1.key

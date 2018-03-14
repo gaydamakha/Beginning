@@ -11,5 +11,29 @@ p.otstup{
 #content{
 	overflow-y: scroll;
 }
+.list-dropdown{
+    padding: 0;
+}
+.list-dropdown li{
+	list-style: none;
+	padding-top: 5px;	
+	outline-style: 5px;	
+}
+.list-dropdown li a {
+    padding: 5px;
+    /*display: block;*/
+}
 .footer{
+}
+
+
+.custom-control-label{
+	cursor: pointer;
+}
+.tab-hod .custom-control-label::before,
+.tab-hod .custom-control-label::after{
+	top: 10px;
+}
+.tab-hod .custom-control-input:active~.custom-control-label::before{
+	background-color: #dee2e6;
 }
