@@ -69,8 +69,6 @@ $(document).ready(function(){
     restart.onsubmit = function(e) {
 		e.preventDefault();
 
-		//socket.emit('createPlayer',{name:inputName.value})	
-
 		socket.emit('reCreate')
 
 		$(".box-restart, .box-game").toggle();
@@ -166,10 +164,6 @@ $(document).ready(function(){
 			areaCtx.textAlign  = 'center';
 			areaCtx.textBaseline   = 'bottom';
 			areaCtx.fillText(self.msg,x,y-70);
-
-
-
-			console.log(self.msg);
 		}
 		self.drawInMiniMap = function(){
 			miniMapCtx.beginPath();
@@ -299,7 +293,6 @@ $(document).ready(function(){
 		self.KY = self.height/Img.map.height;
 
 		self.draw = function(){	
-			// console.log('Рисуется карта');		
 			var x = area.width/2 - Player.list[selfId].x;
 			var y = area.height/2 - Player.list[selfId].y;
 			for (i = 0; i < self.KX; i++){
@@ -317,7 +310,6 @@ $(document).ready(function(){
 
 	socket.on('drawMap',function(data){
 		Map(data.map);
-		//console.log('Карта принята');
 	})
 	var drawMap=function(){
 		areaCtx.clearRect(0,0,area.width,area.height);
@@ -396,8 +388,6 @@ $(document).ready(function(){
 	var toggle = function(){
 		this.toggleClass('disabled');
 	}
-
-
 });
 
 $(function() {

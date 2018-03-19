@@ -1,61 +1,8 @@
-// var express = require('express');
-// var https = require('https');
-// var http = require('http');
-// var app = express();
-// var fs = require('fs');
-
-
-// var options = {
-//     key: fs.readFileSync('./ssl_sertificate1.key'),
-//     cert: fs.readFileSync('./ssl_sertificate1.crt')
-// };
-
-// http.Server(app).listen(80);
-// var server = https.Server(options, app).listen(443);
-
-
-// function requireHTTPS(req, res, next) {
-//     if (!req.secure) {
-//         //FYI this should work for local development as well
-//         return res.redirect('https://' + req.get('host') + req.url);
-//     }
-//     next();
-// }
-
-// app.use(requireHTTPS);
-
-
-// app.get('/',function(req, res) {
-// 	res.sendFile(__dirname + '/client/index.html');
-// });
-// app.get('/about',function(req, res) {
-// 	res.sendFile(__dirname + '/client/about.html');
-// });
-// app.use('/',express.static(__dirname + '/client'));
-var server=require('./server');
-
-var io = require('socket.io')(server.server,{});
-
-
-var TIME = function() {
-	var date = new Date();
-	date.setHours(date.getUTCHours()+4);
-	return date.getHours() + ':' + date.getMinutes() + ':' + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
-} 
-
-
-
-console.log(TIME()+' : Сервер запущен.')
-
-var SOCKET_LIST = {};
-
-
 var Map = function() {
 	var self = {
 		width: 4000,
 		height:4000,
 		border:1000,
-
 	}
 	self.minX = self.border;
 	self.minY = self.border;
@@ -63,8 +10,8 @@ var Map = function() {
 	self.maxY = self.height - self.border;
 	return self;
 }
-var Map = Map();
 
+var Map=Map();
 
 var Entity = function() {
 	var self = {
@@ -88,7 +35,8 @@ var Entity = function() {
 	return self;
 }
 
-
+var initPack = {player:[],bullet:[]};
+var removePack = {player:[],bullet:[]};
 
 var Player = function(socket){
 	var self = Entity();
@@ -138,8 +86,6 @@ var Player = function(socket){
 			}
 
 		}
-
-		//console.log(self.x+':'+self.y);
 	}
 
 	self.hit = function(parentId,damage){
@@ -152,11 +98,12 @@ var Player = function(socket){
 			Player.list[parentId].score++;
 
 			//Player.onDisconnect(self.id);
-			var socket = SOCKET_LIST[self.id];
+			//var socket = SOCKET_LIST[self.id];
 			socket.emit('restart');
 
-			var msg = Player.list[parentId].name + ' убил ' + self.name ;
-			log(msg);
+			var msg = Player.list[parentId].name + ' убил ' + self.name;
+			//log(msg);
+			//Посмотреть события, передать msg в server.js, логгировать
 		}
 	}
 
@@ -240,8 +187,6 @@ var Player = function(socket){
 		}else if (self.y - self.size.value <= Map.minY) {
 			self.spdY = +1;
 		}
-		//console.log(self.spdX+' : '+self.spdY);
-
 	};
 
 	self.getInitPack = function(){
@@ -400,95 +345,21 @@ Bullet.getAllInitPack = function(){
 	return bullets;
 }
 
-var DEBUG = true;
-
-io.sockets.on('connection', function(socket){
-
-	socket.id = Math.random();
-
-	SOCKET_LIST[socket.id] = socket;
-
-	socket.emit('drawMap',{map:Map});
-	socket.on('createPlayer',function(data){
-		socket.name = data.name;
-		Player.onConnect(socket);			
-		var msg = socket.name + ' подключился.';
-		log(msg);
-	});
-
-
-	socket.on('disconnect',function(){
-		delete SOCKET_LIST[socket.id];
-		Player.onDisconnect(socket.id);
-		var msg = socket.name + ' отключился.';
-		log(msg);
-
-	});
-
-
-
-	socket.on('sendMsgToServer',function(data){
-		for(var i in SOCKET_LIST){
-			SOCKET_LIST[i].emit('addToChat',{id:data.id,msg:data.msg});
-		}
-	});
-	
-	socket.on('evalServer',function(data){
-		if(!DEBUG)
-			return;
-		if (data === 'restart') {
-			process.exit(5);
-		}else{
-
-			var res = eval(data);
-			socket.emit('evalAnswer',res);	
-		}	
-	});
-	
-});
-
-var initPack = {player:[],bullet:[]};
-var removePack = {player:[],bullet:[]};
-
-
-setInterval(function(){
-	var pack = {
-		player:Player.update(),
-		bullet:Bullet.update(),
-	}
-	
-	for(var i in SOCKET_LIST){
-		var socket = SOCKET_LIST[i];
-		socket.emit('init',initPack);
-		socket.emit('update',pack);
-		socket.emit('remove',removePack);
-	}
-	initPack.player = [];
-	initPack.bullet = [];
-	removePack.player = [];
-	removePack.bullet = [];
-	
-},30);
-
-
-var log = function(data){
-	console.log(TIME()+' : '+data);
-	for(var i in SOCKET_LIST){
-		SOCKET_LIST[i].emit('addToLog',{date:TIME(),log:data});
-	}
-}
-
 var Tools = {
 	generateColor: function(){
 		return '#' + Math.floor(Math.random()*16777215).toString(16);
 	},
 	getRandomInt: function(min,max){
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}	
+	}
 };
 
-// module.exports = {
-// 	io:io,
-// 	time:TIME(),
-// 	SOCKET_LIST:SOCKET_LIST,
-// }
+module.exports = {
+	PlayerOnConnect:Player.onConnect,
+	PlayerOnDisconnect:Player.onDisconnect,
+	PlayerUpdate:Player.update,
+	BulletUpdate:Bullet.update,
+	Map:Map,
+	initPack:initPack,
+	removePack:removePack
+}
