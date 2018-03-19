@@ -6,7 +6,7 @@ var app = express();
 var fs = require('fs');
 var game = require('./app');
 
-LOCALHOST = true;
+LOCALHOST = false;
 DEBUG = true;
 
 if(!LOCALHOST){
@@ -19,12 +19,12 @@ if(!LOCALHOST){
 
     app.use(requireHTTPS);
     app.get('/',function(req, res) {
-        res.sendFile('/home/hoster/app/client/index.html');
+        res.sendFile(path.join(__dirname, '../client', 'index.html'));
     });
     app.get('/about',function(req, res) {
-        res.sendFile('/home/hoster/app/client/about.html');
+        res.sendFile(path.join(__dirname, '../client', 'about.html'));
     });
-    app.use('/',express.static('/home/hoster/app/client'));
+    app.use('/',express.static(path.join(__dirname, '../client')));
 
 }else{
     var server = http.Server(app).listen(80);
